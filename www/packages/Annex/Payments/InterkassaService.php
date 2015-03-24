@@ -17,6 +17,10 @@ class InterkassaService extends Service {
 
 	private $test_mode = false;
 
+	public function setTestMode () {
+		$this->test_mode = true;
+	}
+
 	public function redirect ($return_form_code = false) {
 		if ( $this->validInputData() === false ) return false;
 
@@ -37,15 +41,9 @@ class InterkassaService extends Service {
 		if ($return_form_code or $this->debug)
 			$comment = '//';
 
-		if ($this->debug)
-			$this->showArray ($params);
 
-		$html =  '<html>
-			<head>
-				<meta charset="utf-8">
-				<title>'.$this->messRedirecting().'</title>
-			</head>
-			<body>'.
+		$html =  '
+				<meta charset="utf-8">'.
 		$this->messRedirecting().
 			'<form id="payment" name="payment" method="post" action="https://sci.interkassa.com/"
 				enctype="' . $this->getEncoding() . '">'.
@@ -57,7 +55,8 @@ class InterkassaService extends Service {
 					((!empty ($params ["ik_exp"]))?
 						'<input type="hidden" name="ik_exp" value="'.$params ["ik_exp"].'" />' : '').
 					((!empty ($params ["ik_pw_via"]))?
-						'<input type="hidden" name="ik_pw_via" value="'.$params ["ik_pw_via"].'" />' : '').
+						'<input type="hidden" name="ik_pw_via" value="'.$params ["ik_pw_via"].'" />'.
+						'<input type="hidden" name="ik_act" value="process" />' : '').
 					((!empty ($params ["ik_loc"]))?
 						'<input type="hidden" name="ik_desc" value="'.$params ["ik_loc"].'" />' : '').
 					((!empty ($params ["ik_cli"]))?
@@ -67,9 +66,10 @@ class InterkassaService extends Service {
 				'</form>
 				<script>
 					'.$comment.'document.getElementById("payment").submit ();
-				</script>
-			</body>
-		</html>';
+				</script>';
+
+		if ($this->debug)
+			$html .= $this->showArray ($params);
 		return $html;
 	}
 
@@ -137,5 +137,14 @@ class InterkassaService extends Service {
 		)
 			? false : $result;
 		return $result;
+	}
+
+	function messFail () {
+		$inv_id = $_REQUEST["InvId"];
+		return "You have refused payment. Order# $inv_id\n";
+	}
+
+	function messRedirecting () {
+		return 'Идет перенаправление на страницу оплаты...';
 	}
 } 

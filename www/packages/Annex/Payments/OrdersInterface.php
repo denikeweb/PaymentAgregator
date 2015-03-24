@@ -11,6 +11,6 @@ namespace Annex\Payments;
 
 
 interface OrdersInterface {
-	public function getOrderPrice ();
-	public function setOrderPaid ();
-} 
+	public function getOrderPrice ($orderId);
+	public function setOrderPaid ($orderId);
+}

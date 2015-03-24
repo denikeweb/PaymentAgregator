@@ -14,8 +14,6 @@ class RobokassaService extends Service {
 	private $login = 'demo';
 	private $pass = 'password_1';
 
-	private $test_mode = false;
-
 	public function redirect ($return_form_code = false) {
 		if ( $this->validInputData() === false ) return false;
 
@@ -51,16 +49,10 @@ class RobokassaService extends Service {
 		if ($return_form_code or $this->debug)
 			$comment = '//';
 
-		if ($this->debug)
-			$this->showArray ($params);
 
-		$html =  '<html>
-			<head>
-				<meta charset="utf-8">
-				<title>'.$this->messRedirecting().'</title>
-			</head>
-			<body>'.
-		$this->messRedirecting().
+		$html =  '
+				<meta charset="utf-8">'.
+				$this->messRedirecting().
 				'<form id="payment" name="payment" method="post" action="https://merchant.roboxchange.com/Index.aspx">
 					<input type="hidden" name="MrchLogin"         value="' . $params ['mrh_login'] .'"    >
 					<input type="hidden" name="OutSum"            value="' . $params ['out_summ'] . '"    >
@@ -74,9 +66,9 @@ class RobokassaService extends Service {
 
 				<script>
 					'.$comment.'document.getElementById("payment").submit ();
-				</script>
-			</body>
-		</html>';
+				</script>';
+		if ($this->debug)
+			$html .= $this->showArray ($params);
 		return $html;
 	}
 
@@ -99,7 +91,7 @@ class RobokassaService extends Service {
 
 		// get order id from input data and get order price
 		$price = $this->getOrderObj()->getOrderPrice($id);
-		
+
 		switch ($dataSet['ik_inv_st']) {
 			case 'success' : $this->successHandler ($my_crc == $crc, $out_summ, $price, $id); break;
 		}
@@ -118,5 +110,9 @@ class RobokassaService extends Service {
 	function messFail () {
 		$inv_id = $_REQUEST["InvId"];
 		return "You have refused payment. Order# $inv_id\n";
+	}
+
+	function messRedirecting () {
+		return 'Идет перенаправление на страницу оплаты...';
 	}
 } 

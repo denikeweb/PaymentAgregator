@@ -295,9 +295,12 @@ abstract class Service implements ServiceInterface {
 	 * @param $array
 	 */
 	protected function showArray ($array) {
+		ob_start();
 		echo '<pre style="white-space: pre-wrap; overflow: hidden; text-align: left;"><code class="php">';
 		print_r($array);
 		echo '</code></pre>';
+		$content = ob_get_clean();
+		return$content;
 	}
 
 	/**
@@ -339,7 +342,7 @@ abstract class Service implements ServiceInterface {
 	 * @param int   $id
 	 */
 	protected function successHandler ($valid, $payed, $price, $id) {
-		$correctSumm = $payed > $price - 0.01;
+		$correctSumm = $payed > $price * 0.99;
 		if ($valid && $correctSumm)
 			$this->getOrderObj()->setOrderPaid ($id);
 			// change order status
